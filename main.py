@@ -8,7 +8,8 @@ import bs4 as bs
 import urllib.request
 import pickle
 import requests
-
+from flask_cors import CORS
+from flask_cors import cross_origin
 # load the nlp model and tfidf vectorizer from disk
 filename = 'nlp_model.pkl'
 clf = pickle.load(open(filename, 'rb'))
@@ -60,7 +61,7 @@ def get_suggestions():
 # Flask API
 
 app = Flask(__name__)
-
+CORS(app)  # Allow frontend to make API requests
 @app.route("/")
 @app.route("/home")
 def home():
@@ -68,6 +69,7 @@ def home():
     return render_template('home.html',suggestions=suggestions)
 
 @app.route("/similarity",methods=['GET',"POST"])
+@cross_origin()
 def similarity():
     movie = request.form['name']
     rc = rcmd(movie)
@@ -78,6 +80,7 @@ def similarity():
         return m_str
 
 @app.route("/recommend",methods=["GET","POST"])
+@cross_origin()
 def recommend():
     # getting data from AJAX request
     title = request.form['title']
